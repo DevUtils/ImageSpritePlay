@@ -6,7 +6,7 @@ $(document).ready(function() {
 			image: 'img/fly.png',
 			frame_count: 4,
 			velocity: 65,
-			autoplay: false,
+			autoplay: true,
 			loop: true
 		}
 	);
@@ -17,7 +17,7 @@ $(document).ready(function() {
 			image: 'img/dragon.png',
 			frame_count: 4,
 			velocity: 65,
-			autoplay: false,
+			autoplay: true,
 			loop: false
 		}
 	);

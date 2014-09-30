@@ -5,9 +5,56 @@
 	<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
 	<script type="text/javascript" src="../src/jquery.ImageSpritePlay.min.js"></script>
 	<script type="text/javascript" src="js/scripts.js"></script>
+	<style type="text/css">
+		body
+		{
+			font-family: arial,helvetica;
+			font-size: 12px;
+		}
+	</style>
 </head>
 <body>
-	<div id="element-2" class="sprite-play"></div>
-	<div id="element-1" class="sprite-play"></div>
+	<table border="1" cellpadding="10" cellspacing="0" width="100%">
+		<tr>
+			<td valign="top" width="200" align="center">
+				<div id="element-1" class="sprite-play"></div>
+				<br/>
+				<i>#element-1</i>
+			</td>
+			<td valign="top" width="200" align="center">
+				<div id="element-2" class="sprite-play"></div>
+				<br/>
+				<i>#element-2</i>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" colspan="2">
+<pre>
+$("#element-1").imageSpritePlay
+(
+	{
+		image: 'img/fly.png',
+		frame_count: 4,
+		velocity: 65,
+		autoplay: true,
+		loop: true
+	}
+);
+
+$("#element-2").imageSpritePlay
+(
+	{
+		image: 'img/dragon.png',
+		frame_count: 4,
+		velocity: 65,
+		autoplay: true,
+		loop: false
+	}
+);
+</pre>
+			</td>
+		</tr>
+	</table>
+
 </body>
 </html>
