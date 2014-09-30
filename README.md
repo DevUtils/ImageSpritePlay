@@ -1,0 +1,4 @@
+ImageSpritePlay
+===============
+
+jQuery Sprite Animator
