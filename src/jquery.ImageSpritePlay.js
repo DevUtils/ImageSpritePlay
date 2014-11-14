@@ -10,6 +10,7 @@
 		inverted    : false,	// false: forward, true: backward
 		velocity    : 500,
 		onComplete  : null,
+		onFrame     : null,
 	};
 	var objects = [];
 
@@ -76,40 +77,40 @@
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
 		objects[ids].options.loop = p_loop;
 		$.fn.imageSpritePlay.refresh(ids);
-	}
+	};
 
 	$.fn.imageSpritePlay.delay = function(p_arg, p_delay)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
 		objects[ids].options.delay = p_delay;
 		$.fn.imageSpritePlay.refresh(ids);
-	}
+	};
 
 	$.fn.imageSpritePlay.invert = function(p_arg)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
 		objects[ids].options.inverted = (!objects[ids].options.inverted);
-		if (objects[ids].timer != null)
+		if (objects[ids].timer !== null)
 		{
 			$.fn.imageSpritePlay.refresh(ids);
 		}
-	}
+	};
 
 	$.fn.imageSpritePlay.velocity = function(p_arg, p_velocity)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
 		objects[ids].options.velocity = p_velocity;
-		if (objects[ids].timer != null)
+		if (objects[ids].timer !== null)
 		{
 			$.fn.imageSpritePlay.refresh(ids);
 		}
-	}
+	};
 
 	$.fn.imageSpritePlay.delay_play = function(p_arg, p_miliseconds)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
 		setTimeout(function() { objects[ids].options.delay = 0; $.fn.imageSpritePlay.play(ids); }, p_miliseconds);
-	}
+	};
 
 	$.fn.imageSpritePlay.play = function(p_arg)
 	{
@@ -121,7 +122,7 @@
 			return $.fn.imageSpritePlay.delay_play(ids, objects[ids].options.delay);
 		}
 
-		if (objects[ids].timer != null)
+		if (objects[ids].timer !== null)
 		{
 			clearInterval(objects[ids].timer);
 		}
@@ -135,33 +136,33 @@
 			},
 			objects[ids].options.velocity
 		);
-	}
+	};
 
 	$.fn.imageSpritePlay.pause = function(p_arg)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
-		if (ids == undefined) { return; }
-		if (objects[ids].timer != null)
+		if (ids === undefined) { return; }
+		if (objects[ids].timer !== null)
 		{
 			clearInterval(objects[ids].timer);
 		}
-	}
+	};
 
 	$.fn.imageSpritePlay.stop = function(p_arg)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
-		if (ids == undefined) { return; }
-		if (objects[ids].timer != null)
+		if (ids === undefined) { return; }
+		if (objects[ids].timer !== null)
 		{
 			clearInterval(objects[ids].timer);
 		}
-	}
+	};
 
 	$.fn.imageSpritePlay.resume = function(p_arg)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
-		if (ids == undefined) { return; }
-		if (objects[ids].timer != null)
+		if (ids === undefined) { return; }
+		if (objects[ids].timer !== null)
 		{
 			clearInterval(objects[ids].timer);
 		}
@@ -174,40 +175,40 @@
 			},
 			objects[ids].options.velocity
 		);
-	}
+	};
 
 	$.fn.imageSpritePlay.refresh = function(p_arg)
 	{
 		$.fn.imageSpritePlay.pause(p_arg);
 		$.fn.imageSpritePlay.resume(p_arg);
-	}
+	};
 
 	$.fn.imageSpritePlay.restart = function(p_arg)
 	{
 		$.fn.imageSpritePlay.stop(p_arg);
 		$.fn.imageSpritePlay.play(p_arg);
-	}
+	};
 
 	$.fn.imageSpritePlay.goto = function(p_arg, p_frame)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
-		if (ids == undefined) { return; }
+		if (ids === undefined) { return; }
 		objects[ids].frame = (p_frame - 1);
 		$.fn.imageSpritePlay.updateFrame(ids);
-	}
+	};
 	
 	$.fn.imageSpritePlay.first = function(p_arg)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
-		if (ids == undefined) { return; }
+		if (ids === undefined) { return; }
 		objects[ids].frame = (!objects[ids].options.inverted) ? 0 : objects[ids].options.frame_count-1;
 		$.fn.imageSpritePlay.updateFrame(ids);
-	}
+	};
 	
 	$.fn.imageSpritePlay.previous = function(p_arg, p_force)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
-		if (ids == undefined) { return; }
+		if (ids === undefined) { return; }
 		if (p_force === undefined)
 		{
 			if (objects[ids].options.inverted)
@@ -216,7 +217,7 @@
 			}
 		}
 
-		if (objects[ids].options.loop == false)
+		if (objects[ids].options.loop === false)
 		{
 			if (objects[ids].frame > 0)
 			{
@@ -224,7 +225,7 @@
 			}
 			else
 			{
-				if (objects[ids].timer != null)
+				if (objects[ids].timer !== null)
 				{
 					$.fn.imageSpritePlay._onComplete(ids);
 					clearInterval(objects[ids].timer);
@@ -250,7 +251,7 @@
 	$.fn.imageSpritePlay.next = function(p_arg, p_force)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
-		if (ids == undefined) { return; }
+		if (ids === undefined) { return; }
 		if (p_force === undefined)
 		{
 			if (objects[ids].options.inverted)
@@ -259,11 +260,11 @@
 			}
 		}
 
-		if (objects[ids].options.loop == false)
+		if (objects[ids].options.loop === false)
 		{
 			if (objects[ids].frame >= objects[ids].options.frame_count-1)
 			{
-				if (objects[ids].timer != null)
+				if (objects[ids].timer !== null)
 				{
 					$.fn.imageSpritePlay._onComplete(ids);
 					clearInterval(objects[ids].timer);
@@ -297,15 +298,24 @@
 		{
 			objects[ids].options.onComplete.call(this, objects[ids]);
 		}
-	}
+	};
+
+	$.fn.imageSpritePlay._onFrame = function(p_arg)
+	{
+		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
+		if (objects[ids].options.onFrame !== null)
+		{
+			objects[ids].options.onFrame.call(this, objects[ids]);
+		}
+	};
 
 	$.fn.imageSpritePlay.last = function(p_arg)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
-		if (ids == undefined) { return; }
+		if (ids === undefined) { return; }
 		objects[ids].frame = (!objects[ids].options.inverted) ? objects[ids].options.frame_count-1 : 0;
 		$.fn.imageSpritePlay.updateFrame(ids);
-	}
+	};
 
 	$.fn.imageSpritePlay.updateFrame = function(p_ids)
 	{
@@ -319,23 +329,24 @@
 				objects[p_ids].element.css('background-position', '0px ' + pos + 'px');
 			break;
 		}
+		$.fn.imageSpritePlay._onFrame(p_ids);
 	};
 	
 	$.fn.imageSpritePlay.attach = function(p_arg, p1, p2)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
-		if (ids == undefined) { return; }
+		if (ids === undefined) { return; }
 		objects[ids].attached = 
 		{
 			marginTop   : p1,
 			marginBottom: p2
-		}
+		};
 
 		$.fn.imageSpritePlay._ajustRuler(objects[ids]);
 
 		$(window).scroll(function(event) { $.fn.imageSpritePlay._ajustRuler(objects[ids]); });
 		$(window).resize(function(event) { $.fn.imageSpritePlay._ajustRuler(objects[ids]); });
-	}
+	};
 
 	$.fn.imageSpritePlay._ajustRuler = function(p_comp)
 	{
@@ -364,7 +375,7 @@
 		{
 			$('#regua').css('backgroundColor', 'blue');
 		}
-	}
+	};
 
 	$.fn.imageSpritePlay.process = function(p_elem, p_options)
 	{

@@ -18,7 +18,15 @@ $(document).ready(function() {
 			frame_count: 4,
 			velocity: 65,
 			autoplay: true,
-			loop: false
+			loop: true,
+			onFrame: function(obj)
+			{
+				if (obj.frame == 2)
+				{
+					$("#element-2").imageSpritePlay('pause');
+					setTimeout(function() { $("#element-2").imageSpritePlay('resume'); }, 2000);
+				}
+			}
 		}
 	);
 
