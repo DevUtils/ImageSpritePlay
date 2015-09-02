@@ -18,6 +18,7 @@
 		beforeStart    : null,
 		afterStop      : null,
 		onLoop         : null,
+		inlineStyle    : true,
 	};
 	var objects = [];
 
@@ -80,6 +81,20 @@
 			text += possible.charAt(Math.floor(Math.random() * pl));
 		}
 		return text;
+	};
+
+	$.fn.imageSpritePlay.createPngMarker = function(p_width, p_height)
+	{
+		var result;
+		var canvasid = 'tmp-canvas-' + p_width + '-' + p_height + '-' + $.fn.imageSpritePlay.makeId();
+		$('body').append('<canvas style="opacity:0; display: none; position: absolute; top: -' + (p_height * 2).toString() + 'px; left: -' + (p_width * 2).toString() + ';" id="' + canvasid  + '" width="' + p_width + '" height="' + p_height + '"></canvas>');
+		var canvas = document.getElementById(canvasid);
+		var context = canvas.getContext('2d');
+		context.fillStyle = 'rgba(0, 0, 0, 0)';
+		context.fillRect(0, 0, p_width, p_height);
+		result = canvas.toDataURL('image/png');
+		$('#' + canvasid).remove();
+		return result;
 	};
 
 	$.fn.imageSpritePlay.loop = function(p_arg, p_loop)
@@ -391,6 +406,18 @@
 		$.fn.imageSpritePlay.updateFrame(ids);
 	};
 
+	$.fn.imageSpritePlay.ajustOnMarker = function(p_ids)
+	{
+		var imgids = '#img-sprite-img-' + p_ids;
+		objects[p_ids].element.css
+		(
+			{
+				'width' : $(imgids).width(),
+				'height': $(imgids).height(),
+			}
+		);
+	};
+
 	$.fn.imageSpritePlay.updateFrame = function(p_ids)
 	{
 		var pos = (objects[p_ids].frame * objects[p_ids].image.frame_size) * -1;
@@ -410,13 +437,15 @@
 	
 	$.fn.imageSpritePlay._updateFrame = function(p_obj, p_element, p_pos, p_direction)
 	{
+		var step = (100 / (p_obj.image.length-1));
+		var prc = step * p_obj.frame;
 		switch(p_direction)
 		{
 			case 'h':
-				p_element.css('background-position', p_pos + 'px 0px');
+				p_element.css('background-position', prc + '% 0px');
 			break;
 			case 'v':
-				p_element.css('background-position', '0px ' + p_pos + 'px');
+				p_element.css('background-position', '0px ' + prc + '%');
 			break;
 		}
 
@@ -539,27 +568,52 @@
 			objects[ids].frame = objects[ids].image.range[0];
 			var pos = (objects[ids].frame * objects[ids].image.frame_size) * -1;
 
+			var prc;
+			var dimension;
 			switch(objects[ids].direction)
 			{
 				case 'h':
+					dimension = [objects[ids].image.frame_size, tmpImg.height];
+					prc = (pos === 0) ? 0 : (100 / pos);
 					objects[ids].element
-						.css('width', objects[ids].image.frame_size)
-						.css('height', objects[ids].image.height)
-						.css('background-image', 'url(' + objects[ids].options.image + ')')
-						.css('background-repeat', 'no-repeat')
-						.css('background-position', pos + 'px 0px')
+						.css('width'              , '100%')
+						.css('height'             , '100%')
+						.css('background-image'   , 'url(' + objects[ids].options.image + ')')
+						.css('background-size'    ,  (objects[ids].image.length * 100).toString() + '%')
+						.css('background-repeat'  , 'no-repeat')
+						.css('background-position', prc + '% 0px')
+						.css('position'           , 'absolute')
+						.css('top'                , '0px')
 					;
 				break;
 				case 'v':
+					dimension = [tmpImg.width, tmpImg.objects[ids].image.frame_size];
 					objects[ids].element
-						.css('width', objects[ids].image.width)
-						.css('height', objects[ids].image.frame_size)
+						.css('width'              , '100%')
+						.css('height'             , '100%')
 						.css('background-image', 'url(' + objects[ids].options.image + ')')
 						.css('background-repeat', 'no-repeat')
 						.css('background-position', '0px ' + pos + 'px')
+						.css('position'           , 'absolute')
+						.css('top'                , '0px')
 					;
 				break;
 			}
+
+			var strpixel = $.fn.imageSpritePlay.createPngMarker(dimension[0], dimension[1]);
+			var imgids = 'img-sprite-img-' + ids;
+			objects[ids].element.wrap('<div style="position: relative;" id="' + ids + '-wrap"></div>');
+			objects[ids].element.parent().prepend('<img id="' + imgids + '" style="width: 100%;" src="' + strpixel + '"/>');
+
+			$(window).resize
+			(
+				function(event)
+				{
+					//$.fn.imageSpritePlay.ajustOnMarker(ids);
+				}
+			);
+
+			//$.fn.imageSpritePlay.ajustOnMarker(ids);
 
 			if (objects[ids].options.autoplay)
 			{

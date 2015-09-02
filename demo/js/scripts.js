@@ -1,13 +1,13 @@
 $(document).ready(function() {
-	
+
 	$("#element-1").imageSpritePlay
 	(
 		{
-			image: 'img/fly.png',
-			frame_count: 4,
-			velocity: 65,
-			autoplay: true,
-			loop: true
+			image       : 'img/fly.png',
+			frame_count : 4,
+			velocity    : 65,
+			autoplay    : true,
+			loop        : true
 		}
 	);
 	
@@ -19,6 +19,19 @@ $(document).ready(function() {
 			velocity    : 250,
 			autoplay    : true,
 			loop        : true,
+			inlineStyle : false
+		}
+	);
+	
+	$("#element-3").imageSpritePlay
+	(
+		{
+			image       : 'img/cat-running.png',
+			frame_count : 8,
+			velocity    : 50,
+			autoplay    : true,
+			loop        : true,
+			inlineStyle : false
 		}
 	);
 

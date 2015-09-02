@@ -3,7 +3,7 @@
 <head>
 	<title>Image Sprite Play - Demo</title>
 	<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
-	<script type="text/javascript" src="../src/jquery.ImageSpritePlay.min.js"></script>
+	<script type="text/javascript" src="../src/jquery.ImageSpritePlay.js"></script>
 	<script type="text/javascript" src="js/scripts.js"></script>
 	<style type="text/css">
 		body
@@ -16,19 +16,26 @@
 <body>
 	<table border="1" cellpadding="10" cellspacing="0" width="100%">
 		<tr>
-			<td valign="top" width="200" align="center">
+			<td valign="top" width="100" align="center">
 				<div id="element-1" class="sprite-play"></div>
 				<br/>
 				<i>#element-1</i>
 			</td>
-			<td valign="top" width="200" align="center">
+			<td valign="top" align="center">
 				<div id="element-2" class="sprite-play"></div>
 				<br/>
 				<i>#element-2</i>
 			</td>
+			<td valign="top" align="center">
+				<div id="element-3" class="sprite-play"></div>
+				<br/>
+				<i>#element-3</i>
+			</td>
 		</tr>
+	</table>
+	<table border="0" cellpadding="10" cellspacing="0" width="100%">
 		<tr>
-			<td valign="top" colspan="2">
+			<td valign="top">
 <pre>
 $(document).ready(function() {
 	
