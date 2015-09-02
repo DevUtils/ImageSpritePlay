@@ -2,15 +2,22 @@
 
 	var defaults =
 	{
-		image       : null,
-		frame_count : 0,
-		loop        : false,
-		autoplay    : false,
-		delay       : 0,		// Delay on first play
-		inverted    : false,	// false: forward, true: backward
-		velocity    : 500,
-		onComplete  : null,
-		onFrame     : null,
+		image          : null,
+		frame_count    : 0,
+		custom_range   : null,
+		next_range     : null,
+		loop           : false,
+		autoplay       : false,
+		delay          : 0,		// Delay on first play
+		inverted       : false,	// false: forward, true: backward
+		velocity       : 500,
+		fadeTransition : false,
+		randomized     : false,
+		onComplete     : null,
+		onFrame        : null,
+		beforeStart    : null,
+		afterStop      : null,
+		onLoop         : null,
 	};
 	var objects = [];
 
@@ -18,30 +25,33 @@
 	{
 		init : function(options)
 		{
-			var opts = $.extend( {}, defaults, options );
+			var opts = $.extend( true, {}, defaults, options );
 
 			return this.each(function()
 			{
 				$.fn.imageSpritePlay.process($(this), opts);
 			});
 		},
-		first      : function()      { return this.each(function() { $.fn.imageSpritePlay.first(this); }); },
-		previous   : function()      { return this.each(function() { $.fn.imageSpritePlay.previous(this); }); },
-		play       : function()      { return this.each(function() { $.fn.imageSpritePlay.play(this); }); },
-		delay_play : function(p_arg) { return this.each(function() { $.fn.imageSpritePlay.delay_play(this, p_arg); }); },
-		pause      : function()      { return this.each(function() { $.fn.imageSpritePlay.pause(this); }); },
-		resume     : function()      { return this.each(function() { $.fn.imageSpritePlay.resume(this); }); },
-		stop       : function()      { return this.each(function() { $.fn.imageSpritePlay.stop(this); }); },
-		next       : function()      { return this.each(function() { $.fn.imageSpritePlay.next(this); }); },
-		goto       : function(p_arg) { return this.each(function() { $.fn.imageSpritePlay.goto(this, p_arg); }); },
-		restart    : function()      { return this.each(function() { $.fn.imageSpritePlay.restart(this); }); },
-		refresh    : function()      { return this.each(function() { $.fn.imageSpritePlay.refresh(this); }); },
-		last       : function()      { return this.each(function() { $.fn.imageSpritePlay.last(this); }); },
-		velocity   : function(p_arg) { return this.each(function() { $.fn.imageSpritePlay.velocity(this, p_arg); }); },
-		loop       : function(p_arg) { return this.each(function() { $.fn.imageSpritePlay.loop(this, p_arg); }); },
-		invert     : function()      { return this.each(function() { $.fn.imageSpritePlay.invert(this); }); },
-		delay      : function(p_arg) { return this.each(function() { $.fn.imageSpritePlay.delay(this, p_arg); }); },
-		attach     : function(p1, p2){ return this.each(function() { $.fn.imageSpritePlay.attach(this, p1, p2); }); },
+		first      : function()          { return this.each(function() { $.fn.imageSpritePlay.first(this); }); },
+		previous   : function()          { return this.each(function() { $.fn.imageSpritePlay.previous(this); }); },
+		play       : function()          { return this.each(function() { $.fn.imageSpritePlay.play(this); }); },
+		delay_play : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.delay_play(this, p_arg); }); },
+		pause      : function()          { return this.each(function() { $.fn.imageSpritePlay.pause(this); }); },
+		resume     : function()          { return this.each(function() { $.fn.imageSpritePlay.resume(this); }); },
+		stop       : function()          { return this.each(function() { $.fn.imageSpritePlay.stop(this); }); },
+		justStop   : function()          { return this.each(function() { $.fn.imageSpritePlay.justStop(this); }); },
+		next       : function()          { return this.each(function() { $.fn.imageSpritePlay.next(this); }); },
+		goto       : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.goto(this, p_arg); }); },
+		restart    : function()          { return this.each(function() { $.fn.imageSpritePlay.restart(this); }); },
+		refresh    : function()          { return this.each(function() { $.fn.imageSpritePlay.refresh(this); }); },
+		last       : function()          { return this.each(function() { $.fn.imageSpritePlay.last(this); }); },
+		velocity   : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.velocity(this, p_arg); }); },
+		loop       : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.loop(this, p_arg); }); },
+		invert     : function()          { return this.each(function() { $.fn.imageSpritePlay.invert(this); }); },
+		delay      : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.delay(this, p_arg); }); },
+		attach     : function(p1, p2)    { return this.each(function() { $.fn.imageSpritePlay.attach(this, p1, p2); }); },
+		setRange   : function(p1, p2)    { return this.each(function() { $.fn.imageSpritePlay.setRange(this, p1, p2); }); },
+		nextRange  : function(p1, p2, p3){ return this.each(function() { $.fn.imageSpritePlay.nextRange(this, p1, p2, p3); }); },
 	};
 
 	$.fn.imageSpritePlay = function(methodOrOptions)
@@ -109,6 +119,7 @@
 	$.fn.imageSpritePlay.delay_play = function(p_arg, p_miliseconds)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
+		if (ids === undefined) { return; }
 		setTimeout(function() { objects[ids].options.delay = 0; $.fn.imageSpritePlay.play(ids); }, p_miliseconds);
 	};
 
@@ -127,7 +138,16 @@
 			clearInterval(objects[ids].timer);
 		}
 
-		$.fn.imageSpritePlay.first(ids);
+		$.fn.imageSpritePlay._beforeStart(ids);
+
+		if (!objects[ids].options.randomized)
+		{
+			$.fn.imageSpritePlay.first(ids);
+		}
+		else
+		{
+			$.fn.imageSpritePlay.next(ids);
+		}
 		objects[ids].timer = setInterval
 		(
 			function()
@@ -149,6 +169,17 @@
 	};
 
 	$.fn.imageSpritePlay.stop = function(p_arg)
+	{
+		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
+		if (ids === undefined) { return; }
+		if (objects[ids].timer !== null)
+		{
+			clearInterval(objects[ids].timer);
+			$.fn.imageSpritePlay._afterStop(ids);
+		}
+	};
+
+	$.fn.imageSpritePlay.justStop = function(p_arg)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
 		if (ids === undefined) { return; }
@@ -201,7 +232,7 @@
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
 		if (ids === undefined) { return; }
-		objects[ids].frame = (!objects[ids].options.inverted) ? 0 : objects[ids].options.frame_count-1;
+		objects[ids].frame = (!objects[ids].options.inverted) ? objects[ids].image.range[0] : objects[ids].image.range[1];
 		$.fn.imageSpritePlay.updateFrame(ids);
 	};
 	
@@ -250,8 +281,22 @@
 
 	$.fn.imageSpritePlay.next = function(p_arg, p_force)
 	{
+		var new_pos;
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
 		if (ids === undefined) { return; }
+
+		if (objects[ids].options.randomized)
+		{
+			jQuery.error('TODO: Apply range');
+			// new_pos = Math.floor(Math.random() * objects[ids].options.frame_count);
+			// while (new_pos == objects[ids].frame)
+			// {
+			// 	new_pos = Math.floor(Math.random() * objects[ids].options.frame_count);
+			// }
+
+			// return $.fn.imageSpritePlay.goto(ids, new_pos );
+		}
+
 		if (p_force === undefined)
 		{
 			if (objects[ids].options.inverted)
@@ -262,11 +307,12 @@
 
 		if (objects[ids].options.loop === false)
 		{
-			if (objects[ids].frame >= objects[ids].options.frame_count-1)
+			if (objects[ids].frame >= objects[ids].image.range[1])
 			{
 				if (objects[ids].timer !== null)
 				{
 					$.fn.imageSpritePlay._onComplete(ids);
+					$.fn.imageSpritePlay._afterStop(ids);
 					clearInterval(objects[ids].timer);
 				}
 				return;
@@ -278,14 +324,30 @@
 		}
 		else
 		{
-			if (objects[ids].frame < objects[ids].options.frame_count-1)
+			if (objects[ids].frame < objects[ids].image.range[1])
 			{
 				objects[ids].frame++;
 			}
 			else
 			{
 				$.fn.imageSpritePlay._onComplete(ids);
-				objects[ids].frame = 0;
+
+				if (objects[ids].options.onLoop !== null)
+				{
+					objects[ids].options.onLoop(objects[ids]);
+				}
+
+				if (objects[ids].options.next_range !== null)
+				{
+					objects[ids].image.range = objects[ids].options.next_range.range;
+					if (objects[ids].options.next_range.callback !== undefined)
+					{
+						objects[ids].options.next_range.callback();
+					}
+					objects[ids].options.next_range = null;
+				}
+
+				objects[ids].frame = objects[ids].image.range[0];
 			}
 		}
 		$.fn.imageSpritePlay.updateFrame(ids);
@@ -294,18 +356,30 @@
 	$.fn.imageSpritePlay._onComplete = function(p_arg)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
+		if (ids === undefined) { return; }
 		if (objects[ids].options.onComplete !== null)
 		{
 			objects[ids].options.onComplete.call(this, objects[ids]);
 		}
 	};
 
-	$.fn.imageSpritePlay._onFrame = function(p_arg)
+	$.fn.imageSpritePlay._beforeStart = function(p_arg)
 	{
 		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
-		if (objects[ids].options.onFrame !== null)
+		if (ids === undefined) { return; }
+		if (objects[ids].options.beforeStart !== null)
 		{
-			objects[ids].options.onFrame.call(this, objects[ids]);
+			objects[ids].options.beforeStart.call(this, objects[ids]);
+		}
+	};
+
+	$.fn.imageSpritePlay._afterStop = function(p_arg)
+	{
+		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
+		if (ids === undefined) { return; }
+		if (objects[ids].options.afterStop !== null)
+		{
+			objects[ids].options.afterStop.call(this, objects[ids]);
 		}
 	};
 
@@ -320,16 +394,36 @@
 	$.fn.imageSpritePlay.updateFrame = function(p_ids)
 	{
 		var pos = (objects[p_ids].frame * objects[p_ids].image.frame_size) * -1;
-		switch(objects[p_ids].direction)
+
+		if (objects[p_ids].options.fadeTransition)
+		{
+			objects[p_ids].element.fadeOut('fast', function() {
+				$.fn.imageSpritePlay._updateFrame(objects[p_ids], objects[p_ids].element, pos, objects[p_ids].direction);
+				objects[p_ids].element.fadeIn('fast');
+			});
+		}
+		else
+		{
+			$.fn.imageSpritePlay._updateFrame(objects[p_ids], objects[p_ids].element, pos, objects[p_ids].direction);
+		}
+	};
+	
+	$.fn.imageSpritePlay._updateFrame = function(p_obj, p_element, p_pos, p_direction)
+	{
+		switch(p_direction)
 		{
 			case 'h':
-				objects[p_ids].element.css('background-position', pos + 'px 0px');
+				p_element.css('background-position', p_pos + 'px 0px');
 			break;
 			case 'v':
-				objects[p_ids].element.css('background-position', '0px ' + pos + 'px');
+				p_element.css('background-position', '0px ' + p_pos + 'px');
 			break;
 		}
-		$.fn.imageSpritePlay._onFrame(p_ids);
+
+		if (p_obj.options.onFrame !== null)
+		{
+			p_obj.options.onFrame(p_obj);
+		}
 	};
 	
 	$.fn.imageSpritePlay.attach = function(p_arg, p1, p2)
@@ -344,8 +438,23 @@
 
 		$.fn.imageSpritePlay._ajustRuler(objects[ids]);
 
-		$(window).scroll(function(event) { $.fn.imageSpritePlay._ajustRuler(objects[ids]); });
-		$(window).resize(function(event) { $.fn.imageSpritePlay._ajustRuler(objects[ids]); });
+		$(document).on('scroll.imageSpritePlay', function(event) { $.fn.imageSpritePlay._ajustRuler(objects[ids]); });
+		$(document).on('resize.imageSpritePlay', function(event) { $.fn.imageSpritePlay._ajustRuler(objects[ids]); });
+	};
+
+	$.fn.imageSpritePlay.setRange = function(p_arg, p1, p2)
+	{
+		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
+		if (ids === undefined) { return; }
+		objects[ids].frame = p1;
+		objects[ids].image.range = [p1, p2];
+	};
+
+	$.fn.imageSpritePlay.nextRange = function(p_arg, p1, p2, p3)
+	{
+		var ids = (typeof(p_arg) == 'object') ? $(p_arg).attr('data-sprite-ids') : p_arg;
+		if (ids === undefined) { return; }
+		objects[ids].options.next_range = { 'range': [p1, p2], 'callback': p3 };
 	};
 
 	$.fn.imageSpritePlay._ajustRuler = function(p_comp)
@@ -385,15 +494,17 @@
 			ids = $.fn.imageSpritePlay.makeId();
 		}
 		var comp = {};
-		comp.element = p_elem;
-		comp.options = p_options;
-		comp.frame = 0;
-		comp.direction = '';
-		comp.image = {};
+		comp.element          = p_elem;
+		comp.options          = p_options;
+		comp.frame            = 0;
+		comp.direction        = '';
+		comp.image            = {};
 		comp.image.frame_size = 0;
-		comp.image.loaded = false;
-		comp.timer = null;
-		comp.attached = null;
+		comp.image.length     = 0;
+		comp.image.range      = (p_options.custom_range === null) ? [0, 0] : p_options.custom_range;
+		comp.image.loaded     = false;
+		comp.timer            = null;
+		comp.attached         = null;
 
 		objects[ids] = (comp);
 		p_elem.attr('data-sprite-ids', ids).addClass('ImageSpritePlay');
@@ -406,30 +517,50 @@
 			objects[ids].image.image  = tmpImg;
 			objects[ids].image.width  = tmpImg.width;
 			objects[ids].image.height = tmpImg.height;
-			objects[ids].direction = (objects[ids].image.width > objects[ids].image.height) ? 'h' : 'v';
+			objects[ids].direction    = (objects[ids].image.width > objects[ids].image.height) ? 'h' : 'v';
+
 			switch(objects[ids].direction)
 			{
 				case 'h':
 					objects[ids].image.frame_size = objects[ids].image.width / objects[ids].options.frame_count;
+					objects[ids].image.length     = (tmpImg.width / objects[ids].image.frame_size);
+				break;
+				case 'v':
+					objects[ids].image.frame_size = objects[ids].image.height / objects[ids].options.frame_count;
+					objects[ids].image.length     = (tmpImg.height / objects[ids].image.frame_size);
+				break;
+			}
+
+			if (objects[ids].options.custom_range === null)
+			{
+				objects[ids].image.range = [0, objects[ids].image.length-1];
+			}
+
+			objects[ids].frame = objects[ids].image.range[0];
+			var pos = (objects[ids].frame * objects[ids].image.frame_size) * -1;
+
+			switch(objects[ids].direction)
+			{
+				case 'h':
 					objects[ids].element
 						.css('width', objects[ids].image.frame_size)
 						.css('height', objects[ids].image.height)
 						.css('background-image', 'url(' + objects[ids].options.image + ')')
 						.css('background-repeat', 'no-repeat')
-						.css('background-position', '0px 0px')
+						.css('background-position', pos + 'px 0px')
 					;
 				break;
 				case 'v':
-					objects[ids].image.frame_size = objects[ids].image.height / objects[ids].options.frame_count;
 					objects[ids].element
 						.css('width', objects[ids].image.width)
 						.css('height', objects[ids].image.frame_size)
 						.css('background-image', 'url(' + objects[ids].options.image + ')')
 						.css('background-repeat', 'no-repeat')
-						.css('background-position', '0px 0px')
+						.css('background-position', '0px ' + pos + 'px')
 					;
 				break;
 			}
+
 			if (objects[ids].options.autoplay)
 			{
 				$.fn.imageSpritePlay.play(ids);
@@ -438,3 +569,8 @@
 	};
 
 })( jQuery );
+
+function stopAllImageSpritePlay()
+{
+	$('.ImageSpritePlay').imageSpritePlay('stop');
+}
