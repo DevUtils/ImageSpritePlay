@@ -33,25 +33,25 @@
 				$.fn.imageSpritePlay.process($(this), opts);
 			});
 		},
-		first      : function()          { return this.each(function() { $.fn.imageSpritePlay.first(this); }); },
-		previous   : function()          { return this.each(function() { $.fn.imageSpritePlay.previous(this); }); },
-		play       : function()          { return this.each(function() { $.fn.imageSpritePlay.play(this); }); },
-		delay_play : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.delay_play(this, p_arg); }); },
-		pause      : function()          { return this.each(function() { $.fn.imageSpritePlay.pause(this); }); },
-		resume     : function()          { return this.each(function() { $.fn.imageSpritePlay.resume(this); }); },
-		stop       : function()          { return this.each(function() { $.fn.imageSpritePlay.stop(this); }); },
-		justStop   : function()          { return this.each(function() { $.fn.imageSpritePlay.justStop(this); }); },
-		next       : function()          { return this.each(function() { $.fn.imageSpritePlay.next(this); }); },
-		goto       : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.goto(this, p_arg); }); },
-		restart    : function()          { return this.each(function() { $.fn.imageSpritePlay.restart(this); }); },
-		refresh    : function()          { return this.each(function() { $.fn.imageSpritePlay.refresh(this); }); },
-		last       : function()          { return this.each(function() { $.fn.imageSpritePlay.last(this); }); },
-		velocity   : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.velocity(this, p_arg); }); },
-		loop       : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.loop(this, p_arg); }); },
-		invert     : function()          { return this.each(function() { $.fn.imageSpritePlay.invert(this); }); },
-		delay      : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.delay(this, p_arg); }); },
-		attach     : function(p1, p2)    { return this.each(function() { $.fn.imageSpritePlay.attach(this, p1, p2); }); },
-		setRange   : function(p1, p2)    { return this.each(function() { $.fn.imageSpritePlay.setRange(this, p1, p2); }); },
+		first      : function()          { return this.each(function() { $.fn.imageSpritePlay.first(this)                ; }); },
+		previous   : function()          { return this.each(function() { $.fn.imageSpritePlay.previous(this)             ; }); },
+		play       : function()          { return this.each(function() { $.fn.imageSpritePlay.play(this)                 ; }); },
+		delay_play : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.delay_play(this, p_arg)    ; }); },
+		pause      : function()          { return this.each(function() { $.fn.imageSpritePlay.pause(this)                ; }); },
+		resume     : function()          { return this.each(function() { $.fn.imageSpritePlay.resume(this)               ; }); },
+		stop       : function()          { return this.each(function() { $.fn.imageSpritePlay.stop(this)                 ; }); },
+		justStop   : function()          { return this.each(function() { $.fn.imageSpritePlay.justStop(this)             ; }); },
+		next       : function()          { return this.each(function() { $.fn.imageSpritePlay.next(this)                 ; }); },
+		goto       : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.goto(this, p_arg)          ; }); },
+		restart    : function()          { return this.each(function() { $.fn.imageSpritePlay.restart(this)              ; }); },
+		refresh    : function()          { return this.each(function() { $.fn.imageSpritePlay.refresh(this)              ; }); },
+		last       : function()          { return this.each(function() { $.fn.imageSpritePlay.last(this)                 ; }); },
+		velocity   : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.velocity(this, p_arg)      ; }); },
+		loop       : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.loop(this, p_arg)          ; }); },
+		invert     : function()          { return this.each(function() { $.fn.imageSpritePlay.invert(this)               ; }); },
+		delay      : function(p_arg)     { return this.each(function() { $.fn.imageSpritePlay.delay(this, p_arg)         ; }); },
+		attach     : function(p1, p2)    { return this.each(function() { $.fn.imageSpritePlay.attach(this, p1, p2)       ; }); },
+		setRange   : function(p1, p2)    { return this.each(function() { $.fn.imageSpritePlay.setRange(this, p1, p2)     ; }); },
 		nextRange  : function(p1, p2, p3){ return this.each(function() { $.fn.imageSpritePlay.nextRange(this, p1, p2, p3); }); },
 	};
 
@@ -591,8 +591,8 @@
 					objects[ids].element
 						.css('width'              , '100%')
 						.css('height'             , '100%')
-						.css('background-image', 'url(' + objects[ids].options.image + ')')
-						.css('background-repeat', 'no-repeat')
+						.css('background-image'   , 'url(' + objects[ids].options.image + ')')
+						.css('background-repeat'  , 'no-repeat')
 						.css('background-position', '0px ' + pos + 'px')
 						.css('position'           , 'absolute')
 						.css('top'                , '0px')
@@ -605,16 +605,6 @@
 			objects[ids].element.wrap('<div style="position: relative;" id="' + ids + '-wrap"></div>');
 			objects[ids].element.parent().prepend('<img id="' + imgids + '" style="width: 100%;" src="' + strpixel + '"/>');
 
-			$(window).resize
-			(
-				function(event)
-				{
-					//$.fn.imageSpritePlay.ajustOnMarker(ids);
-				}
-			);
-
-			//$.fn.imageSpritePlay.ajustOnMarker(ids);
-
 			if (objects[ids].options.autoplay)
 			{
 				$.fn.imageSpritePlay.play(ids);
@@ -622,7 +612,7 @@
 		};
 	};
 
-})( jQuery );
+})(jQuery);
 
 function stopAllImageSpritePlay()
 {
